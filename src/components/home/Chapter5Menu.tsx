@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import VideoPlayer from "@/components/ui/VideoPlayer";
 import { MENU_CATEGORIES, MENU_ITEMS } from "@/data/menu-data";
 
 export default function Chapter5Menu() {
@@ -49,16 +49,17 @@ export default function Chapter5Menu() {
             </p>
           </div>
 
-          {/* Milk Pour Video Featurette */}
-          <div className="lg:col-span-4 relative aspect-[16/10] bg-[#17120F] overflow-hidden border border-[#17120F]/20 shadow-xl">
-            <VideoPlayer
-              src="/videos/milk-pour.mp4"
-              poster="/images/hero-poster.webp"
-              overlayOpacity={0.15}
-              ariaLabel="Steamed Guernsey milk being poured slowly into a rich double espresso extraction creating precise latte art"
-              className="w-full h-full"
+          {/* Editorial Craft Featurette */}
+          <div className="lg:col-span-4 relative aspect-[16/10] bg-[#17120F] overflow-hidden border border-[#17120F]/20 shadow-xl group">
+            <Image
+              src="/images/hero-poster.webp"
+              alt="Steamed Guernsey milk poured into rich espresso"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-95"
+              sizes="(max-width: 1024px) 100vw, 33vw"
             />
-            <div className="absolute bottom-2.5 left-2.5 bg-[#17120F]/80 text-[#F3EBDD] text-[9px] font-mono tracking-widest uppercase px-2 py-1">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#17120F]/80 via-transparent to-transparent" />
+            <div className="absolute bottom-2.5 left-2.5 bg-[#17120F]/85 text-[#F3EBDD] text-[9px] font-mono tracking-widest uppercase px-2.5 py-1 border border-[#F3EBDD]/15">
               Guernsey Milk 62°C • Microfoam
             </div>
           </div>
@@ -92,7 +93,7 @@ export default function Chapter5Menu() {
           </div>
         )}
 
-        {/* Editorial Menu List (No Generic Cards) */}
+        {/* Editorial Menu List */}
         <div className="py-8 divide-y divide-[#17120F]/10">
           {filteredItems.map((item) => (
             <div

@@ -58,6 +58,18 @@ export default function VideoPlayer({
     const video = videoRef.current;
     if (!video) return;
 
+    // Enforce muted property directly on DOM element for guaranteed browser autoplay
+    video.muted = muted;
+
+    if (autoPlay && !reducedMotion) {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Fallback if browser policy delays autoplay until interaction
+        });
+      }
+    }
+
     // Handle time updates if requested
     const handleTime = () => {
       if (onTimeUpdate && video.duration) {
@@ -74,16 +86,14 @@ export default function VideoPlayer({
           if (entry.isIntersecting && !reducedMotion && autoPlay) {
             const playPromise = video.play();
             if (playPromise !== undefined) {
-              playPromise.catch(() => {
-                // Autoplay blocked
-              });
+              playPromise.catch(() => {});
             }
           } else {
             video.pause();
           }
         });
       },
-      { threshold: 0.25 }
+      { threshold: 0.15 }
     );
 
     observer.observe(video);
@@ -92,7 +102,7 @@ export default function VideoPlayer({
       video.removeEventListener("timeupdate", handleTime);
       observer.disconnect();
     };
-  }, [autoPlay, reducedMotion, onTimeUpdate]);
+  }, [autoPlay, muted, reducedMotion, onTimeUpdate]);
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
@@ -107,6 +117,7 @@ export default function VideoPlayer({
         playsInline
         preload={priority ? "auto" : "metadata"}
         onLoadedData={() => setIsLoaded(true)}
+        onCanPlay={() => setIsLoaded(true)}
         aria-label={ariaLabel}
         className={`w-full h-full transition-opacity duration-1000 ${
           isLoaded ? "opacity-100" : "opacity-0"

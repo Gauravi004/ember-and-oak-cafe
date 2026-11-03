@@ -50,11 +50,14 @@ export default function Chapter1Hero() {
       {/* Background Cinematic Video */}
       <div className="absolute inset-0 z-0">
         <VideoPlayer
-          src="/videos/hero-roaster.mp4"
+          src="/videos/milk-pour.mp4"
           poster="/images/hero-poster.webp"
           priority
+          autoPlay={true}
+          loop={true}
+          muted={true}
           overlayOpacity={0.45}
-          ariaLabel="Roaster drum dropping glowing hot coffee beans into cooling tray"
+          ariaLabel="Steamed milk poured slowly into espresso in continuous cinematic loop"
           className="w-full h-full"
         />
         {/* Soft Radial Vignette */}

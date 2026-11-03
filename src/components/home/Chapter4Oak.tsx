@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import VideoPlayer from "@/components/ui/VideoPlayer";
+import Image from "next/image";
 import { CAFE_CONFIG } from "@/data/cafe-config";
 import { Trees, Timer, Sparkles } from "lucide-react";
 
@@ -29,17 +29,18 @@ export default function Chapter4Oak() {
           </h2>
         </div>
 
-        {/* Grid: Cinematic Video & Process Anatomy */}
+        {/* Grid: Cinematic Visual & Process Anatomy */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center pt-6">
-          {/* Cellar Video Showcase */}
-          <div className="lg:col-span-7 relative aspect-[4/3] sm:aspect-video bg-[#17120F] border border-[#F3EBDD]/20 overflow-hidden shadow-2xl">
-            <VideoPlayer
-              src="/videos/oak-cellar.mp4"
-              poster="/images/hero-poster.webp"
-              overlayOpacity={0.25}
-              ariaLabel="Cinematic tracking shot gliding past charred oak maturation barrels in cellar"
-              className="w-full h-full"
+          {/* Cellar Showcase Frame */}
+          <div className="lg:col-span-7 relative aspect-[4/3] sm:aspect-video bg-[#17120F] border border-[#F3EBDD]/20 overflow-hidden shadow-2xl group">
+            <Image
+              src="/images/hero-poster.webp"
+              alt="Charred oak casks and maturation cellar barrels"
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-90"
+              sizes="(max-width: 1024px) 100vw, 60vw"
             />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#17120F]/90 via-[#17120F]/30 to-transparent" />
             <div className="absolute bottom-4 left-4 bg-[#17120F]/85 border border-[#F3EBDD]/15 px-3 py-1.5 text-[10px] tracking-[0.2em] uppercase font-mono text-[#F3EBDD]/80">
               Cellar Vault B • Cask Head Rest
             </div>

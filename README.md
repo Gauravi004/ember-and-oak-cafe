@@ -30,11 +30,11 @@ EMBER & OAK is a cinematic, editorial, full-stack specialty coffee roastery web 
 
 ## 2. Homepage Architecture (8 Cinematic Chapters)
 
-1. **Chapter I — The Ember (Hero)**: Full-screen opening sequence featuring original `hero-roaster.mp4`, dynamic transparent-to-solid navigation transition, and cinematic editorial reveals.
+1. **Chapter I — The Ember (Hero)**: Full-screen opening sequence featuring animated background video `milk-pour.mp4` playing on continuous loop, dynamic transparent-to-solid navigation transition, and cinematic editorial reveals.
 2. **Chapter II — The Slow Statement**: The roasting philosophy: *"We do not rush what fire must teach, nor shorten what oak must finish."* Three pillars and micro-batch metrics.
 3. **Chapter III — The Roast**: GSAP ScrollTrigger pinned animation showcasing `roast-process.mp4`. Synchronized scrub through *Green & Patient*, *Gold & Sweet*, and *Dark Enough to Sing*.
-4. **Chapter IV — The Oak**: Full-width Deep Olive section featuring `oak-cellar.mp4`, exploring the science of 72-hour carbon discharge and oak tannin absorption.
-5. **Chapter V — The Menu**: First Warm Cream section featuring `milk-pour.mp4`, editorial specialty menu layouts, tasting notes, and origins.
+4. **Chapter IV — The Oak**: Full-width Deep Olive section featuring editorial cask maturation imagery, exploring the science of 72-hour carbon discharge and oak tannin absorption.
+5. **Chapter V — The Menu**: First Warm Cream section featuring editorial craft roastery visuals, specialty menu layouts, tasting notes, and origins.
 6. **Chapter VI — The Room**: Interactive spatial architectural showcase of the zinc brew bar, mezzanine roastery, reading library, and barrel cellar.
 7. **Chapter VII — Evenings & Gatherings**: Program guide for Saturday origin cuppings, Oak Hour analog vinyl nights, and masterclasses.
 8. **Chapter VIII — Reserve & Visit**: Second Warm Cream section with interactive table reservation booking form, Foundry Quarter location, and transit instructions.
