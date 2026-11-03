@@ -1,26 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,300..900;1,300..900&family=Instrument+Serif:ital@0;1&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-espresso: #17120F;
+  --color-warm-cream: #F3EBDD;
+  --color-burnt-copper: #B97845;
+  --color-muted-olive: #77735B;
+  --color-char: #0E0B09;
+  --color-oak-brown: #231C16;
+  --color-deep-olive: #3B3A2D;
+  --color-ash: rgba(243, 235, 221, 0.68);
+
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #17120F;
+  --text-primary: #F3EBDD;
+  --copper: #B97845;
+  --olive: #77735B;
+  --oak: #231C16;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background-color: #17120F;
+  color: #F3EBDD;
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: #17120F;
+  color: #F3EBDD;
+  min-height: 100vh;
+}
+
+::selection {
+  background-color: #B97845;
+  color: #17120F;
+}
+
+/* Custom Typography Utilities */
+.font-display {
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.font-body {
+  font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Editorial Grain Overlay */
+.grain-overlay {
+  background-image: radial-gradient(rgba(243, 235, 221, 0.04) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #17120F;
+}
+::-webkit-scrollbar-thumb {
+  background: #231C16;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B97845;
+}
+
+/* Subtle corner styling per design rules */
+.editorial-border {
+  border: 1px solid rgba(243, 235, 221, 0.12);
+}
+
+.editorial-border-copper {
+  border: 1px solid rgba(185, 120, 69, 0.35);
 }

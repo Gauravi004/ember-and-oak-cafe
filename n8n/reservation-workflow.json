@@ -1,0 +1,205 @@
+{
+  "name": "Ember & Oak — Reservation Processing Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ember-oak-reservation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-reservation",
+      "name": "Webhook — Reservation Received",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "ember-oak-reservation"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "cond-email",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "cond-name",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "validate-fields",
+      "name": "Validate Required Fields",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [440, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "={{ $env.GOOGLE_SHEETS_RESERVATIONS_ID }}",
+        "range": "Reservations!A:H",
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldId": "ReservationID", "fieldValue": "={{ $json.body.id }}" },
+            { "fieldId": "Timestamp", "fieldValue": "={{ $now.toISO() }}" },
+            { "fieldId": "Name", "fieldValue": "={{ $json.body.name }}" },
+            { "fieldId": "Email", "fieldValue": "={{ $json.body.email }}" },
+            { "fieldId": "Phone", "fieldValue": "={{ $json.body.phone }}" },
+            { "fieldId": "Date", "fieldValue": "={{ $json.body.date }}" },
+            { "fieldId": "Time", "fieldValue": "={{ $json.body.time }}" },
+            { "fieldId": "Guests", "fieldValue": "={{ $json.body.guests }}" },
+            { "fieldId": "Seating", "fieldValue": "={{ $json.body.seatingPreference }}" },
+            { "fieldId": "SpecialRequests", "fieldValue": "={{ $json.body.specialRequests || 'None' }}" },
+            { "fieldId": "Status", "fieldValue": "CONFIRMED" }
+          ]
+        }
+      },
+      "id": "sheets-append",
+      "name": "Store in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('validate-fields').item.json.body.email }}",
+        "subject": "Ember & Oak — Your Table Reservation is Confirmed",
+        "message": "Greetings {{ $('validate-fields').item.json.body.name }},\n\nWe are pleased to confirm your reservation at Ember & Oak Roastery.\n\nDate: {{ $('validate-fields').item.json.body.date }}\nTime: {{ $('validate-fields').item.json.body.time }}\nParty: {{ $('validate-fields').item.json.body.guests }} Guests\nSeating: {{ $('validate-fields').item.json.body.seatingPreference }}\nReference: {{ $('validate-fields').item.json.body.id }}\n\nAddress: 18 Ironworks Lane, Old Foundry Quarter, London EC2A 4NE.\n\nWe look forward to pouring for you.\n\nWarm regards,\nThe Ember & Oak Team",
+        "options": {}
+      },
+      "id": "gmail-customer-confirm",
+      "name": "Send Guest Confirmation Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "sendTo": "tables@emberandoak.com",
+        "subject": "New Reservation: {{ $('validate-fields').item.json.body.name }} ({{ $('validate-fields').item.json.body.guests }} guests)",
+        "message": "New booking received via Website API:\n\nGuest: {{ $('validate-fields').item.json.body.name }}\nEmail: {{ $('validate-fields').item.json.body.email }}\nPhone: {{ $('validate-fields').item.json.body.phone }}\nDate: {{ $('validate-fields').item.json.body.date }} at {{ $('validate-fields').item.json.body.time }}\nParty Size: {{ $('validate-fields').item.json.body.guests }}\nSeating: {{ $('validate-fields').item.json.body.seatingPreference }}\nNotes: {{ $('validate-fields').item.json.body.specialRequests }}",
+        "options": {}
+      },
+      "id": "notify-owner",
+      "name": "Notify Roastery Floor Manager",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Reservation accepted and logged to roastery registry.', id: $('validate-fields').item.json.body.id }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-success",
+      "name": "Respond Success to Next.js API",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: false, error: 'Invalid reservation payload received.' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error",
+      "name": "Respond Validation Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [680, 420]
+    }
+  ],
+  "connections": {
+    "Webhook — Reservation Received": {
+      "main": [
+        [
+          {
+            "node": "Validate Required Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Required Fields": {
+      "main": [
+        [
+          {
+            "node": "Store in Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Validation Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Guest Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Guest Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Notify Roastery Floor Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Roastery Floor Manager": {
+      "main": [
+        [
+          {
+            "node": "Respond Success to Next.js API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

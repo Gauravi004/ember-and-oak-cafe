@@ -1,0 +1,108 @@
+{
+  "name": "Ember & Oak — Contact & Wholesale Inquiry Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ember-oak-contact",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-contact",
+      "name": "Webhook — Contact Inquiry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "ember-oak-contact"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "={{ $env.GOOGLE_SHEETS_INQUIRIES_ID }}",
+        "range": "Inquiries!A:G",
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldId": "InquiryID", "fieldValue": "={{ $json.body.id }}" },
+            { "fieldId": "Timestamp", "fieldValue": "={{ $now.toISO() }}" },
+            { "fieldId": "Name", "fieldValue": "={{ $json.body.name }}" },
+            { "fieldId": "Email", "fieldValue": "={{ $json.body.email }}" },
+            { "fieldId": "Phone", "fieldValue": "={{ $json.body.phone || 'N/A' }}" },
+            { "fieldId": "Subject", "fieldValue": "={{ $json.body.subject }}" },
+            { "fieldId": "Message", "fieldValue": "={{ $json.body.message }}" }
+          ]
+        }
+      },
+      "id": "sheets-inquiries",
+      "name": "Store Inquiry in Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "hello@emberandoak.com",
+        "subject": "New [{{ $json.body.subject.toUpperCase() }}] Message from {{ $json.body.name }}",
+        "message": "New contact form transmission received:\n\nName: {{ $json.body.name }}\nEmail: {{ $json.body.email }}\nPhone: {{ $json.body.phone }}\nDepartment: {{ $json.body.subject }}\nMessage:\n{{ $json.body.message }}",
+        "options": {}
+      },
+      "id": "gmail-staff-alert",
+      "name": "Alert Roastery Staff via Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Message logged and staff notified.' }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-contact",
+      "name": "Respond Success to API",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [940, 300]
+    }
+  ],
+  "connections": {
+    "Webhook — Contact Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Store Inquiry in Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Inquiry in Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Alert Roastery Staff via Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Roastery Staff via Gmail": {
+      "main": [
+        [
+          {
+            "node": "Respond Success to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

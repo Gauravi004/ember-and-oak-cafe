@@ -1,0 +1,85 @@
+{
+  "name": "Ember & Oak — AI FAQ Sommelier Webhook Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ember-oak-faq",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-faq",
+      "name": "Webhook — FAQ Question",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "ember-oak-faq"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={{ $env.GEMINI_API_KEY }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  contents: [{\n    parts: [{\n      text: 'You are the Head Sommelier at Ember & Oak Roastery in London. Sourcing: Direct trade 88+ SCA lots from Colombia, Ethiopia, Guatemala, Panama. Roasting: 12kg micro-batches in cast iron, 72 hours aged in French Oak charred casks. Hours: Mon-Fri 07:00-17:30, Sat 08:00-18:30, Sun 08:30-17:00. Oak Hour: Thu & Fri 18:00-22:00. Location: 18 Ironworks Lane, London EC2A 4NE. Answer this question concisely based strictly on these facts: ' + $json.body.question\n    }]\n  }]\n}) }}",
+        "options": {}
+      },
+      "id": "gemini-request",
+      "name": "Call Gemini AI via HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({\n  success: true,\n  answer: $json.candidates[0].content.parts[0].text,\n  source: 'n8n-gemini-node'\n}) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-faq",
+      "name": "Respond Answer to Next.js API",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [740, 300]
+    }
+  ],
+  "connections": {
+    "Webhook — FAQ Question": {
+      "main": [
+        [
+          {
+            "node": "Call Gemini AI via HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Gemini AI via HTTP": {
+      "main": [
+        [
+          {
+            "node": "Respond Answer to Next.js API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

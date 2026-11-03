@@ -1,0 +1,110 @@
+{
+  "name": "Ember & Oak — Event Booking & Private Hire Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ember-oak-event",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-event",
+      "name": "Webhook — Event Inquiry",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "ember-oak-event"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "={{ $env.GOOGLE_SHEETS_EVENTS_ID }}",
+        "range": "Events!A:H",
+        "fieldsUi": {
+          "fieldValues": [
+            { "fieldId": "EnquiryID", "fieldValue": "={{ $json.body.id }}" },
+            { "fieldId": "Timestamp", "fieldValue": "={{ $now.toISO() }}" },
+            { "fieldId": "ClientName", "fieldValue": "={{ $json.body.name }}" },
+            { "fieldId": "Email", "fieldValue": "={{ $json.body.email }}" },
+            { "fieldId": "Phone", "fieldValue": "={{ $json.body.phone }}" },
+            { "fieldId": "EventType", "fieldValue": "={{ $json.body.eventType }}" },
+            { "fieldId": "Guests", "fieldValue": "={{ $json.body.estimatedGuests }}" },
+            { "fieldId": "PreferredDate", "fieldValue": "={{ $json.body.preferredDate }}" },
+            { "fieldId": "Message", "fieldValue": "={{ $json.body.message }}" }
+          ]
+        }
+      },
+      "id": "sheets-events",
+      "name": "Append to Event Roster",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "sendTo": "events@emberandoak.com",
+        "subject": "Private Event Inquiry: {{ $json.body.name }} ({{ $json.body.estimatedGuests }} Guests - {{ $json.body.eventType }})",
+        "message": "New Private Hire / Event Request:\n\nClient: {{ $json.body.name }}\nEmail: {{ $json.body.email }}\nPhone: {{ $json.body.phone }}\nType: {{ $json.body.eventType }}\nGuests: {{ $json.body.estimatedGuests }}\nPreferred Date: {{ $json.body.preferredDate }}\nOverview:\n{{ $json.body.message }}",
+        "options": {}
+      },
+      "id": "gmail-event-lead",
+      "name": "Notify Hospitality Director",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Event inquiry recorded in roastery roster.' }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "respond-event",
+      "name": "Respond Success to API",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [940, 300]
+    }
+  ],
+  "connections": {
+    "Webhook — Event Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Append to Event Roster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Event Roster": {
+      "main": [
+        [
+          {
+            "node": "Notify Hospitality Director",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Hospitality Director": {
+      "main": [
+        [
+          {
+            "node": "Respond Success to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
